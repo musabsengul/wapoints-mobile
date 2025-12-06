@@ -18,13 +18,12 @@ export default function RootLayout() {
     useThemeStore.getState().initialize();
 
     // Request notification permissions
-    requestNotificationPermissions().then((granted: boolean) => {
+    requestNotificationPermissions().then((granted) => {
       if (granted) {
         setupNotificationListeners();
       }
     });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []); // Only run once on mount
+  }, []);
 
   return (
     <QueryProvider>
@@ -41,3 +40,4 @@ export default function RootLayout() {
     </QueryProvider>
   );
 }
+

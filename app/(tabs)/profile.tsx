@@ -1,12 +1,18 @@
-import { View, Text, TouchableOpacity, Alert, StyleSheet } from 'react-native';
+import { View, Alert, Switch, TouchableOpacity, Text, StyleSheet, ScrollView } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useAuthStore } from '@/store/auth-store';
+import { useThemeStore } from '@/store/theme-store';
+import { ScreenLayout } from '@/components/ui/ScreenLayout';
+import { H2, Body, Caption } from '@/components/ui/Typography';
 import { useColors } from '@/utils/styles';
 import { spacing, borderRadius, typography } from '@/config/theme';
+import { User, MapPin, Moon, LogOut, ChevronRight } from 'lucide-react-native';
 
 export default function ProfileScreen() {
   const router = useRouter();
   const { user, resource, logout } = useAuthStore();
+  const { colorScheme, toggleTheme } = useThemeStore();
+  const isDark = colorScheme === 'dark';
   const colors = useColors();
 
   const handleLogout = async () => {
@@ -30,130 +36,156 @@ export default function ProfileScreen() {
   const styles = StyleSheet.create({
     container: {
       flex: 1,
-      backgroundColor: colors.surface,
     },
     header: {
-      backgroundColor: colors.background,
-      paddingHorizontal: spacing.lg,
-      paddingVertical: spacing.md,
-      borderBottomWidth: 1,
-      borderBottomColor: colors.border,
-    },
-    headerTitle: {
-      fontSize: typography['2xl'],
-      fontWeight: 'bold',
-      color: colors.text,
-    },
-    profileCard: {
-      backgroundColor: colors.background,
-      marginTop: spacing.md,
-      marginHorizontal: spacing.md,
-      borderRadius: borderRadius.md,
-      padding: spacing.lg,
-      borderWidth: 1,
-      borderColor: colors.border,
-    },
-    profileHeader: {
-      marginBottom: spacing.lg,
+      alignItems: 'center',
+      paddingVertical: spacing.xl,
+      marginBottom: spacing.md,
     },
     avatar: {
-      width: 80,
-      height: 80,
-      borderRadius: 40,
-      backgroundColor: colors.primary,
+      width: 100,
+      height: 100,
+      borderRadius: 50,
+      backgroundColor: colors.surface,
       alignItems: 'center',
       justifyContent: 'center',
       marginBottom: spacing.md,
+      borderWidth: 1,
+      borderColor: colors.border,
+      shadowColor: '#000',
+      shadowOffset: { width: 0, height: 2 },
+      shadowOpacity: 0.05,
+      shadowRadius: 4,
+      elevation: 2,
     },
     avatarText: {
-      color: '#ffffff',
-      fontSize: typography['2xl'],
-      fontWeight: 'bold',
+      fontSize: 40,
+      fontWeight: '600',
+      color: colors.primary,
     },
     userName: {
-      fontSize: typography['2xl'],
-      fontWeight: 'bold',
-      color: colors.text,
-      marginBottom: spacing.xs,
+      marginBottom: 4,
+      textAlign: 'center',
     },
     userEmail: {
-      fontSize: typography.base,
-      color: colors.textSecondary,
+      textAlign: 'center',
     },
-    profileDetails: {
-      borderTopWidth: 1,
-      borderTopColor: colors.border,
-      paddingTop: spacing.md,
+    section: {
+      backgroundColor: colors.surface,
+      borderRadius: borderRadius['2xl'],
+      overflow: 'hidden',
+      marginBottom: spacing.lg,
+      borderWidth: 1,
+      borderColor: colors.border,
     },
-    detailItem: {
-      marginBottom: spacing.md,
+    row: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      padding: spacing.md,
+      borderBottomWidth: 1,
+      borderBottomColor: colors.border,
     },
-    detailLabel: {
+    lastRow: {
+      borderBottomWidth: 0,
+    },
+    iconContainer: {
+      width: 32,
+      height: 32,
+      borderRadius: borderRadius.md,
+      backgroundColor: colors.background,
+      alignItems: 'center',
+      justifyContent: 'center',
+      marginRight: spacing.md,
+    },
+    rowContent: {
+      flex: 1,
+    },
+    rowLabel: {
       fontSize: typography.sm,
       color: colors.textSecondary,
-      marginBottom: spacing.xs,
+      marginBottom: 2,
     },
-    detailValue: {
+    rowValue: {
       fontSize: typography.base,
       fontWeight: '500',
       color: colors.text,
     },
-    logoutContainer: {
-      marginTop: 'auto',
-      marginBottom: spacing.lg,
-      marginHorizontal: spacing.md,
+    settingRow: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'space-between',
     },
     logoutButton: {
-      backgroundColor: colors.error,
-      borderRadius: borderRadius.md,
-      paddingVertical: spacing.md,
+      flexDirection: 'row',
       alignItems: 'center',
+      justifyContent: 'center',
+      padding: spacing.md,
+      marginTop: spacing.xl,
     },
-    logoutButtonText: {
-      color: '#ffffff',
+    logoutText: {
+      color: colors.error,
       fontWeight: '600',
-      fontSize: typography.lg,
+      fontSize: typography.base,
+      marginLeft: spacing.sm,
     },
   });
 
   return (
-    <View style={styles.container}>
-      {/* Header */}
-      <View style={styles.header}>
-        <Text style={styles.headerTitle}>Profil</Text>
-      </View>
-
-      {/* Profile Info */}
-      <View style={styles.profileCard}>
-        <View style={styles.profileHeader}>
+    <ScreenLayout style={styles.container}>
+      <ScrollView showsVerticalScrollIndicator={false}>
+        <View style={styles.header}>
           <View style={styles.avatar}>
             <Text style={styles.avatarText}>
               {user?.full_name?.charAt(0)?.toUpperCase() || 'U'}
             </Text>
           </View>
-          <Text style={styles.userName}>{user?.full_name || 'Kullanıcı'}</Text>
-          <Text style={styles.userEmail}>{user?.email || ''}</Text>
+          <H2 style={styles.userName}>{user?.full_name || 'Kullanıcı'}</H2>
+          <Caption style={styles.userEmail}>{user?.email}</Caption>
         </View>
 
-        <View style={styles.profileDetails}>
-          <View style={styles.detailItem}>
-            <Text style={styles.detailLabel}>Personel Adı</Text>
-            <Text style={styles.detailValue}>{resource?.name || '-'}</Text>
+        <View style={styles.section}>
+          <View style={styles.row}>
+            <View style={styles.iconContainer}>
+              <User size={18} color={colors.text} />
+            </View>
+            <View style={styles.rowContent}>
+              <Text style={styles.rowLabel}>Personel Adı</Text>
+              <Text style={styles.rowValue}>{resource?.name || '-'}</Text>
+            </View>
           </View>
-
-          <View style={styles.detailItem}>
-            <Text style={styles.detailLabel}>Lokasyon</Text>
-            <Text style={styles.detailValue}>{resource?.location || '-'}</Text>
+          <View style={[styles.row, styles.lastRow]}>
+            <View style={styles.iconContainer}>
+              <MapPin size={18} color={colors.text} />
+            </View>
+            <View style={styles.rowContent}>
+              <Text style={styles.rowLabel}>Lokasyon</Text>
+              <Text style={styles.rowValue}>{resource?.location || '-'}</Text>
+            </View>
           </View>
         </View>
-      </View>
 
-      {/* Logout Button */}
-      <View style={styles.logoutContainer}>
-        <TouchableOpacity onPress={handleLogout} style={styles.logoutButton}>
-          <Text style={styles.logoutButtonText}>Çıkış Yap</Text>
+        <View style={styles.section}>
+          <View style={[styles.row, styles.lastRow, styles.settingRow]}>
+            <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+              <View style={styles.iconContainer}>
+                <Moon size={18} color={colors.text} />
+              </View>
+              <Body>Karanlık Mod</Body>
+            </View>
+            <Switch
+              value={isDark}
+              onValueChange={toggleTheme}
+              trackColor={{ false: colors.border, true: colors.primary }}
+              thumbColor={'#ffffff'}
+            />
+          </View>
+        </View>
+
+        <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
+          <LogOut size={20} color={colors.error} />
+          <Text style={styles.logoutText}>Çıkış Yap</Text>
         </TouchableOpacity>
-      </View>
-    </View>
+      </ScrollView>
+    </ScreenLayout>
   );
 }

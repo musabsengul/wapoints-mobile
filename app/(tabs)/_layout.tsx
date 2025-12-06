@@ -1,35 +1,18 @@
 import { Tabs, Redirect } from 'expo-router';
 import { useAuthStore } from '@/store/auth-store';
-import { ActivityIndicator, View, StyleSheet } from 'react-native';
+import { ActivityIndicator, View, StyleSheet, Platform } from 'react-native';
+import { useThemeStore } from '@/store/theme-store';
 import { useColors } from '@/utils/styles';
+import { Calendar, User } from 'lucide-react-native';
 
 export default function TabsLayout() {
   const { isAuthenticated, isLoading } = useAuthStore();
+  const { colorScheme } = useThemeStore();
   const colors = useColors();
-
-  const styles = StyleSheet.create({
-    loadingContainer: {
-      flex: 1,
-      alignItems: 'center',
-      justifyContent: 'center',
-      backgroundColor: colors.background,
-    },
-    tabIcon: {
-      width: 20,
-      height: 20,
-      borderRadius: 10,
-      borderWidth: 2,
-    },
-    tabIconRound: {
-      width: 20,
-      height: 20,
-      borderRadius: 10,
-    },
-  });
 
   if (isLoading) {
     return (
-      <View style={styles.loadingContainer}>
+      <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', backgroundColor: colors.background }}>
         <ActivityIndicator size="large" color={colors.primary} />
       </View>
     );
@@ -46,17 +29,24 @@ export default function TabsLayout() {
         tabBarActiveTintColor: colors.primary,
         tabBarInactiveTintColor: colors.textSecondary,
         tabBarStyle: {
-          backgroundColor: colors.background,
-          borderTopColor: colors.border,
+          backgroundColor: colors.surface,
+          borderTopWidth: 1,
+          height: Platform.OS === 'ios' ? 88 : 60,
+          paddingBottom: Platform.OS === 'ios' ? 28 : 8,
+          paddingTop: 8,
+        },
+        tabBarLabelStyle: {
+          fontSize: 12,
+          fontWeight: '500',
         },
       }}
     >
       <Tabs.Screen
         name="appointments"
         options={{
-          title: 'Randevular',
-          tabBarIcon: ({ color }) => (
-            <View style={[styles.tabIcon, { borderColor: color }]} />
+          title: 'Takvim',
+          tabBarIcon: ({ color, size }) => (
+            <Calendar color={color} size={size} />
           ),
         }}
       />
@@ -64,8 +54,8 @@ export default function TabsLayout() {
         name="profile"
         options={{
           title: 'Profil',
-          tabBarIcon: ({ color }) => (
-            <View style={[styles.tabIconRound, { backgroundColor: color }]} />
+          tabBarIcon: ({ color, size }) => (
+            <User color={color} size={size} />
           ),
         }}
       />

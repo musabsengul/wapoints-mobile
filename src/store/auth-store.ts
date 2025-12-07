@@ -2,7 +2,10 @@ import { create } from 'zustand';
 import { User, Resource } from '@/types/api';
 import { SecureStoreService } from '@/utils/secure-store';
 import { authService } from '@/services/auth-service';
+import { fcmService } from '@/services/fcm-service';
 import { LoginRequest } from '@/types/api';
+import { getFCMToken, deleteFCMToken } from '@/utils/notifications';
+import { Platform } from 'react-native';
 
 interface AuthState {
   isAuthenticated: boolean;
@@ -40,6 +43,25 @@ export const useAuthStore = create<AuthState>((set) => ({
         resource: response.resource,
         isLoading: false,
       });
+
+      // Register FCM token after successful login
+      try {
+        const fcmToken = await getFCMToken();
+        if (fcmToken) {
+          console.log('📱 FCM Token alındı:', fcmToken);
+          console.log('📤 Backend\'e gönderiliyor...');
+          await fcmService.registerToken({
+            token: fcmToken,
+            device_type: Platform.OS === 'ios' ? 'ios' : Platform.OS === 'android' ? 'android' : 'web',
+          });
+          console.log('✅ FCM Token backend\'e başarıyla kaydedildi');
+        } else {
+          console.warn('⚠️ FCM Token alınamadı');
+        }
+      } catch (fcmError) {
+        console.error('❌ FCM token kayıt hatası:', fcmError);
+        // Don't throw - FCM registration failure shouldn't block login
+      }
     } catch (error) {
       set({ isLoading: false });
       throw error;
@@ -47,14 +69,46 @@ export const useAuthStore = create<AuthState>((set) => ({
   },
 
   logout: async () => {
-    await SecureStoreService.clearAll();
-    set({
-      isAuthenticated: false,
-      token: null,
-      user: null,
-      resource: null,
-      isLoading: false,
-    });
+    try {
+      // Get FCM token before clearing storage
+      const fcmToken = await getFCMToken();
+
+      // Delete FCM token from backend if token exists
+      if (fcmToken) {
+        try {
+          await fcmService.deleteToken({ token: fcmToken });
+        } catch (error) {
+          console.error('Error deleting FCM token from backend:', error);
+        }
+
+        // Delete FCM token from device
+        try {
+          await deleteFCMToken();
+        } catch (error) {
+          console.error('Error deleting FCM token from device:', error);
+        }
+      }
+
+      // Call logout endpoint with FCM token
+      try {
+        await authService.logout(fcmToken ? { fcm_token: fcmToken } : undefined);
+      } catch (error) {
+        console.error('Error calling logout endpoint:', error);
+        // Continue with local logout even if API call fails
+      }
+    } catch (error) {
+      console.error('Error during logout:', error);
+    } finally {
+      // Clear local storage and state
+      await SecureStoreService.clearAll();
+      set({
+        isAuthenticated: false,
+        token: null,
+        user: null,
+        resource: null,
+        isLoading: false,
+      });
+    }
   },
 
   initialize: async () => {

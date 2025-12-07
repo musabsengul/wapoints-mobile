@@ -52,3 +52,30 @@ export interface ApiError {
   statusCode?: number;
 }
 
+// FCM Token Types
+export interface RegisterFCMTokenRequest {
+  token: string;
+  device_type: 'ios' | 'android' | 'web';
+  device_id?: string;
+}
+
+export interface RegisterFCMTokenResponse {
+  status: 'registered';
+}
+
+export interface DeleteFCMTokenRequest {
+  token: string;
+}
+
+export interface DeleteFCMTokenResponse {
+  status: 'deleted';
+}
+
+export interface LogoutRequest {
+  fcm_token?: string;
+}
+
+export interface LogoutResponse {
+  status: 'logged_out';
+}
+

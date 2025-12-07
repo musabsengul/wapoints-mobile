@@ -20,25 +20,81 @@ WAPoints personel (resource) hesapları için mobil uygulama.
 
 ```bash
 npm install
+# veya
+yarn install
 ```
 
-2. Expo CLI'yi global olarak yükleyin (eğer yüklü değilse):
+2. EAS CLI'yi global olarak yükleyin (development build için):
 
 ```bash
-npm install -g expo-cli
+npm install -g eas-cli
 ```
 
-3. Uygulamayı başlatın:
+3. EAS hesabınıza giriş yapın:
+
+```bash
+eas login
+```
+
+## Development Build (Önerilen)
+
+Bu proje Firebase native modülleri kullandığı için **Expo Go çalışmaz**. Development build kullanmanız gerekir.
+
+### İlk Kurulum
+
+1. **Development build oluşturun:**
+
+```bash
+# iOS için
+npm run build:dev:ios
+
+# Android için
+npm run build:dev:android
+```
+
+2. **Build tamamlandıktan sonra:**
+
+- **iOS**: Simulator'da otomatik açılır veya fiziksel cihazda TestFlight üzerinden yükleyin
+- **Android**: APK dosyasını indirip cihazınıza yükleyin
+
+3. **Development server'ı başlatın:**
 
 ```bash
 npm start
+# veya
+npm run start
 ```
 
-veya
+4. **Uygulamayı açın ve QR kodu tarayın** veya development build içinde otomatik bağlanır.
+
+### Günlük Geliştirme
 
 ```bash
-npx expo start
+# Development server'ı başlat (--dev-client flag'i otomatik eklenir)
+npm start
+
+# Veya platform spesifik
+npm run ios      # iOS simulator
+npm run android  # Android emulator
 ```
+
+### Local Development Build (Opsiyonel)
+
+Eğer EAS Build kullanmak istemiyorsanız, local olarak da build alabilirsiniz:
+
+```bash
+# Native klasörleri oluştur
+npx expo prebuild
+
+# iOS için (Mac gerekli)
+cd ios && pod install && cd ..
+npx expo run:ios
+
+# Android için
+npx expo run:android
+```
+
+**Not:** Local build için Xcode (iOS) ve Android Studio (Android) kurulu olmalıdır.
 
 ## Proje Yapısı
 
@@ -103,16 +159,27 @@ API base URL'i `src/config/api.ts` dosyasında yapılandırılmıştır:
 
 ### Bildirimler
 
+- Firebase Cloud Messaging (FCM) entegrasyonu
 - Push notification izinleri
-- Bildirim handler yapılandırması
+- Foreground ve background notification handling
+- FCM token yönetimi (otomatik kayıt/silme)
 
 ## Önemli Notlar
 
-1. **Token Güvenliği**: Token'lar Expo Secure Store'da güvenli bir şekilde saklanmaktadır.
+1. **Development Build Gerekli**: Firebase native modülleri kullanıldığı için Expo Go çalışmaz. Development build kullanmanız gerekir.
 
-2. **API Bağlantısı**: Development için localhost kullanılmaktadır. Emulator veya gerçek cihazda çalıştırmak için IP adresini güncellemeniz gerekebilir.
+2. **Token Güvenliği**: Token'lar Expo Secure Store'da güvenli bir şekilde saklanmaktadır.
 
-3. **Bildirimler**: Expo push notification token'ı almak için `expo-notifications` package'ı yapılandırılmalıdır.
+3. **API Bağlantısı**: Development için localhost kullanılmaktadır. Emulator veya gerçek cihazda çalıştırmak için IP adresini güncellemeniz gerekebilir.
+
+4. **Firebase Yapılandırması**:
+   - iOS için `GoogleService-Info.plist` dosyası root'ta mevcut
+   - Android için `google-services.json` dosyasını Firebase Console'dan indirip root'a ekleyin
+   - Her iki dosya da `app.json`'da yapılandırılmıştır
+
+5. **FCM Token Yönetimi**: 
+   - Login sonrası FCM token otomatik olarak backend'e kaydedilir
+   - Logout sırasında FCM token backend'den ve cihazdan silinir
 
 ## Geliştirme
 

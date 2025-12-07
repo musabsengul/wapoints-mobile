@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "1099161608878",
+    "project_id": "wapoints-81200",
+    "storage_bucket": "wapoints-81200.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1099161608878:android:16a93fb89995a9e07f833f",
+        "android_client_info": {
+          "package_name": "app.wapoints.com"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAAUfMDvctj2EPrm3sLitg0SFpnxmCRPuI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
